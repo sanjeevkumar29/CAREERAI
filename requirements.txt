@@ -1,10 +1,10 @@
 streamlit
 pandas
-numpy
 python-dotenv
 langchain
 langchain-core
-langchain-openai
 langchain-groq
+langchain-openai
+langchain-nvidia-ai-endpoints
 langgraph
 langsmith
