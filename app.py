@@ -50,7 +50,6 @@ _CAREER_SALARY_MAP: dict[str, float] = {
 }
 
 def _salary_lakhs_from_domain(domain: str) -> float:
-    """Return a realistic ₹ Lakhs salary for a career domain using keyword match."""
     d = domain.lower()
     for keyword, lakhs in _CAREER_SALARY_MAP.items():
         if keyword in d:
@@ -58,14 +57,6 @@ def _salary_lakhs_from_domain(domain: str) -> float:
     return 9.5
 
 def _normalise_salary_to_lakhs(raw: float, domain: str = "") -> float:
-    """
-    Convert raw salary to Lakhs. Rules:
-      raw <= 0 / 60000  -> domain keyword map (missing/default)
-      raw <= 300        -> already in Lakhs  (e.g. 18 -> 18L)
-      raw <= 100_000    -> USD amount        (e.g. 80000 -> 67.2L)
-      raw > 100_000     -> already INR       (e.g. 2000000 -> 20L, 3500000 -> 35L)
-    Real CSV values are ALWAYS trusted. No upper cap.
-    """
     if raw <= 0 or raw == 60000:
         return _salary_lakhs_from_domain(domain)
     if raw <= 300:
@@ -83,7 +74,6 @@ def format_inr(raw: float, domain: str = "") -> str:
     return f"₹{lakhs:.1f}L"
 
 def format_inr_chip(raw: float, domain: str = "") -> str:
-    """Always return in Lakhs (L) — realistic Indian range 4–20L."""
     lakhs = _normalise_salary_to_lakhs(raw, domain)
     return f"₹{lakhs:.1f}L"
 
@@ -235,21 +225,6 @@ section[data-testid="stSidebar"]{{
     backdrop-filter:blur(20px);
 }}
 
-.theme-btn{{
-    display:inline-flex;align-items:center;gap:7px;
-    padding:7px 15px;border-radius:99px;cursor:pointer;
-    font-family:'Inter',sans-serif;font-size:0.73rem;font-weight:700;
-    letter-spacing:0.04em;border:1.5px solid var(--border-input);
-    background:var(--bg-card);color:var(--text-primary);
-    box-shadow:0 2px 16px rgba(99,102,241,0.18);
-    transition:all 0.22s;backdrop-filter:blur(12px);
-}}
-.theme-btn:hover{{
-    background:rgba(99,102,241,0.18);
-    border-color:rgba(99,102,241,0.6);
-    box-shadow:0 4px 24px rgba(99,102,241,0.28);
-}}
-
 .pipe-banner{{
     display:flex;align-items:center;justify-content:center;
     gap:0.35rem;flex-wrap:wrap;
@@ -361,8 +336,32 @@ section[data-testid="stSidebar"]{{
 }}
 .stTextInput>div>div>input:focus{{border-color:rgba(99,102,241,0.7)!important;box-shadow:0 0 0 3px rgba(99,102,241,0.1)!important}}
 .stSelectbox>div>div{{background:var(--bg-input)!important;border:1.5px solid var(--border-input)!important;border-radius:10px!important}}
-.stButton>button{{background:linear-gradient(135deg,#6366f1,#4f46e5)!important;color:white!important;border:none!important;border-radius:10px!important;padding:0.56rem 1.6rem!important;font-weight:700!important;font-size:0.86rem!important;width:100%!important;box-shadow:0 4px 20px rgba(99,102,241,0.35)!important;transition:all 0.2s!important}}
+
+.stButton>button{{
+    background:linear-gradient(135deg,#6366f1,#4f46e5)!important;
+    color:white!important;border:none!important;border-radius:10px!important;
+    padding:0.56rem 1.6rem!important;font-weight:700!important;font-size:0.86rem!important;
+    width:100%!important;white-space:nowrap!important;
+    box-shadow:0 4px 20px rgba(99,102,241,0.35)!important;transition:all 0.2s!important
+}}
 .stButton>button:hover{{transform:translateY(-2px)!important;box-shadow:0 8px 30px rgba(99,102,241,0.5)!important}}
+
+[data-testid="stHorizontalBlock"]:first-of-type .stButton>button{{
+    width:auto!important;
+    padding:0.45rem 1.2rem!important;
+    font-size:0.78rem!important;
+    white-space:nowrap!important;
+    background:var(--bg-card)!important;
+    border:1.5px solid var(--border-input)!important;
+    color:var(--text-primary)!important;
+    box-shadow:0 2px 16px rgba(99,102,241,0.18)!important;
+    backdrop-filter:blur(12px);
+}}
+[data-testid="stHorizontalBlock"]:first-of-type .stButton>button:hover{{
+    background:rgba(99,102,241,0.18)!important;
+    border-color:rgba(99,102,241,0.6)!important;
+    box-shadow:0 4px 24px rgba(99,102,241,0.28)!important;
+}}
 
 .stTabs [data-baseweb="tab-list"]{{background:var(--tab-list)!important;border-radius:12px!important;padding:4px!important;gap:4px!important;border:1px solid var(--border-main)!important}}
 .stTabs [data-baseweb="tab"]{{background:transparent!important;color:var(--tab-text)!important;border-radius:8px!important;font-weight:600!important;font-size:0.82rem!important;padding:0.44rem 1rem!important}}
