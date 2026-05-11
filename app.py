@@ -50,7 +50,6 @@ _CAREER_SALARY_MAP: dict[str, float] = {
 }
 
 def _salary_lakhs_from_domain(domain: str) -> float:
-    """Return a realistic ₹ Lakhs salary for a career domain using keyword match."""
     d = domain.lower()
     for keyword, lakhs in _CAREER_SALARY_MAP.items():
         if keyword in d:
@@ -58,14 +57,6 @@ def _salary_lakhs_from_domain(domain: str) -> float:
     return 9.5
 
 def _normalise_salary_to_lakhs(raw: float, domain: str = "") -> float:
-    """
-    Convert raw salary to Lakhs. Rules:
-      raw <= 0 / 60000  -> domain keyword map (missing/default)
-      raw <= 300        -> already in Lakhs  (e.g. 18 -> 18L)
-      raw <= 100_000    -> USD amount        (e.g. 80000 -> 67.2L)
-      raw > 100_000     -> already INR       (e.g. 2000000 -> 20L, 3500000 -> 35L)
-    Real CSV values are ALWAYS trusted. No upper cap.
-    """
     if raw <= 0 or raw == 60000:
         return _salary_lakhs_from_domain(domain)
     if raw <= 300:
@@ -83,7 +74,6 @@ def format_inr(raw: float, domain: str = "") -> str:
     return f"₹{lakhs:.1f}L"
 
 def format_inr_chip(raw: float, domain: str = "") -> str:
-    """Always return in Lakhs (L) — realistic Indian range 4–20L."""
     lakhs = _normalise_salary_to_lakhs(raw, domain)
     return f"₹{lakhs:.1f}L"
 
@@ -120,77 +110,89 @@ def toggle_theme():
 
 IS_DARK = st.session_state.theme == "dark"
 
+# ── Complete CSS variable sets ─────────────────────────────────────────────────
+# All values are fully specified — no empty declarations.
 
 DARK_VARS = """
-    --bg-base:
-    --bg-card:       rgba(15,23,42,0.75);
-    --bg-card-solid:
-    --bg-input:      rgba(15,23,42,0.8);
-    --bg-chip:       rgba(30,41,59,0.8);
-    --bg-sidebar:    rgba(15,23,42,0.96);
-    --border-main:   rgba(99,102,241,0.2);
-    --border-input:  rgba(99,102,241,0.3);
-    --border-chip:   rgba(99,102,241,0.18);
-    --text-primary:
-    --text-secondary:
-    --text-muted:
-    --text-faint:
-    --text-faintest:
-    --divider:       rgba(30,41,59,0.8);
-    --trend-bg:      rgba(30,41,59,0.5);
-    --trend-border:  rgba(99,102,241,0.13);
-    --tab-list:      rgba(15,23,42,0.6);
-    --tab-text:
-    --tab-sel:       rgba(99,102,241,0.25);
-    --tab-sel-text:
-    --prog-bg:       rgba(30,41,59,0.8);
-    --cmp-border:    rgba(30,41,59,0.6);
-    --scrollbar-track:
-    --scrollbar-thumb:
-    --bg-radial1:    rgba(99,102,241,0.18);
-    --bg-radial2:    rgba(16,185,129,0.14);
-    --bg-radial3:    rgba(118,169,250,0.10);
-    --bg-radial4:    rgba(6,182,212,0.07);
-    --hero-sub:
-    --pipe-bg:       rgba(15,23,42,0.75);
-    --pipe-border:   rgba(99,102,241,0.22);
-    --pipe-arrow:
+    --bg-base:               #060d1f;
+    --bg-card:               rgba(15,23,42,0.75);
+    --bg-card-solid:         #0b1428;
+    --bg-input:              rgba(15,23,42,0.8);
+    --bg-chip:               rgba(30,41,59,0.8);
+    --bg-sidebar:            rgba(10,18,40,0.97);
+    --border-main:           rgba(99,102,241,0.2);
+    --border-input:          rgba(99,102,241,0.3);
+    --border-chip:           rgba(99,102,241,0.18);
+    --text-primary:          #e2e8f0;
+    --text-secondary:        #94a3b8;
+    --text-muted:            #64748b;
+    --text-faint:            #475569;
+    --text-faintest:         #2d3f5a;
+    --divider:               rgba(30,41,59,0.8);
+    --trend-bg:              rgba(15,23,42,0.6);
+    --trend-border:          rgba(99,102,241,0.15);
+    --tab-list:              rgba(15,23,42,0.7);
+    --tab-text:              #94a3b8;
+    --tab-sel:               rgba(99,102,241,0.28);
+    --tab-sel-text:          #e2e8f0;
+    --prog-bg:               rgba(30,41,59,0.8);
+    --cmp-border:            rgba(30,41,59,0.6);
+    --scrollbar-track:       #0b1428;
+    --scrollbar-thumb:       #1e3a5f;
+    --bg-radial1:            rgba(99,102,241,0.18);
+    --bg-radial2:            rgba(16,185,129,0.14);
+    --bg-radial3:            rgba(118,169,250,0.10);
+    --bg-radial4:            rgba(6,182,212,0.07);
+    --hero-sub:              #76a9fa;
+    --pipe-bg:               rgba(10,18,40,0.85);
+    --pipe-border:           rgba(99,102,241,0.25);
+    --pipe-arrow:            #818cf8;
+    --stage-text:            #cbd5e1;
+    --card-hover-border:     rgba(99,102,241,0.45);
+    --metric-chip-bg:        rgba(15,28,55,0.9);
+    --expander-bg:           rgba(10,18,40,0.7);
+    --stapp-bg:              #060d1f;
 """
 
 LIGHT_VARS = """
-    --bg-base:
-    --bg-card:       rgba(255,255,255,0.88);
-    --bg-card-solid:
-    --bg-input:      rgba(255,255,255,0.9);
-    --bg-chip:       rgba(224,237,255,0.9);
-    --bg-sidebar:    rgba(225,240,255,0.97);
-    --border-main:   rgba(99,102,241,0.25);
-    --border-input:  rgba(99,102,241,0.4);
-    --border-chip:   rgba(99,102,241,0.22);
-    --text-primary:
-    --text-secondary:
-    --text-muted:
-    --text-faint:
-    --text-faintest:
-    --divider:       rgba(99,102,241,0.15);
-    --trend-bg:      rgba(200,220,255,0.5);
-    --trend-border:  rgba(99,102,241,0.2);
-    --tab-list:      rgba(200,220,255,0.5);
-    --tab-text:
-    --tab-sel:       rgba(99,102,241,0.18);
-    --tab-sel-text:
-    --prog-bg:       rgba(200,220,255,0.5);
-    --cmp-border:    rgba(99,102,241,0.15);
-    --scrollbar-track:
-    --scrollbar-thumb:
-    --bg-radial1:    rgba(99,102,241,0.10);
-    --bg-radial2:    rgba(16,185,129,0.08);
-    --bg-radial3:    rgba(118,169,250,0.06);
-    --bg-radial4:    rgba(6,182,212,0.04);
-    --hero-sub:
-    --pipe-bg:       rgba(255,255,255,0.75);
-    --pipe-border:   rgba(99,102,241,0.3);
-    --pipe-arrow:
+    --bg-base:               #c8deff;
+    --bg-card:               rgba(255,255,255,0.88);
+    --bg-card-solid:         #ffffff;
+    --bg-input:              rgba(255,255,255,0.9);
+    --bg-chip:               rgba(191,219,254,0.8);
+    --bg-sidebar:            rgba(219,234,254,0.97);
+    --border-main:           rgba(59,130,246,0.28);
+    --border-input:          rgba(59,130,246,0.4);
+    --border-chip:           rgba(59,130,246,0.25);
+    --text-primary:          #0f172a;
+    --text-secondary:        #1e3a5f;
+    --text-muted:            #334155;
+    --text-faint:            #4b6a8a;
+    --text-faintest:         #64748b;
+    --divider:               rgba(59,130,246,0.18);
+    --trend-bg:              rgba(219,234,254,0.7);
+    --trend-border:          rgba(59,130,246,0.22);
+    --tab-list:              rgba(191,219,254,0.6);
+    --tab-text:              #1e3a5f;
+    --tab-sel:               rgba(59,130,246,0.2);
+    --tab-sel-text:          #0f172a;
+    --prog-bg:               rgba(191,219,254,0.55);
+    --cmp-border:            rgba(59,130,246,0.18);
+    --scrollbar-track:       #bfdbfe;
+    --scrollbar-thumb:       #60a5fa;
+    --bg-radial1:            rgba(59,130,246,0.12);
+    --bg-radial2:            rgba(16,185,129,0.08);
+    --bg-radial3:            rgba(96,165,250,0.08);
+    --bg-radial4:            rgba(6,182,212,0.06);
+    --hero-sub:              #1d4ed8;
+    --pipe-bg:               rgba(255,255,255,0.82);
+    --pipe-border:           rgba(59,130,246,0.35);
+    --pipe-arrow:            #3b82f6;
+    --stage-text:            #1e293b;
+    --card-hover-border:     rgba(59,130,246,0.55);
+    --metric-chip-bg:        rgba(219,234,254,0.9);
+    --expander-bg:           rgba(219,234,254,0.55);
+    --stapp-bg:              #c8deff;
 """
 
 THEME_VARS = DARK_VARS if IS_DARK else LIGHT_VARS
@@ -202,12 +204,22 @@ st.markdown(f"""
 :root {{ {THEME_VARS} }}
 
 *,*::before,*::after{{box-sizing:border-box;margin:0;padding:0}}
-html,body,.stApp{{
-    background:var(--bg-base)!important;
-    font-family:'Inter',sans-serif!important;
-    color:var(--text-primary)!important;
+
+/* ── Base app background ──────────────────────────────────── */
+html,
+body,
+.stApp,
+[data-testid="stAppViewContainer"],
+[data-testid="stMain"],
+[data-testid="stMainBlockContainer"],
+.main,
+.block-container {{
+    background-color: var(--bg-base) !important;
+    font-family:'Inter',sans-serif !important;
+    color:var(--text-primary) !important;
 }}
 
+/* ── Radial gradient overlay ──────────────────────────────── */
 .stApp::before{{
     content:'';position:fixed;inset:0;z-index:-1;
     background:
@@ -218,23 +230,58 @@ html,body,.stApp{{
         var(--bg-base);
     animation:bgP 12s ease-in-out infinite alternate;
 }}
-@keyframes bgP{{0%{{opacity:1}}100%{{opacity:0.85}}}}
+@keyframes bgP{{0%{{opacity:1}}100%{{opacity:0.88}}}}
 
+/* ── Scrollbar ────────────────────────────────────────────── */
 ::-webkit-scrollbar{{width:6px}}
 ::-webkit-scrollbar-track{{background:var(--scrollbar-track)}}
 ::-webkit-scrollbar-thumb{{background:var(--scrollbar-thumb);border-radius:3px}}
 
+/* ── Streamlit chrome overrides ───────────────────────────── */
 header[data-testid="stHeader"]{{display:none!important;height:0!important}}
 .block-container{{padding-top:0.5rem!important;margin-top:0!important}}
 [data-testid="stAppViewContainer"]{{padding-top:0!important}}
 [data-testid="stMain"]{{padding-top:0!important}}
-.stDeployButton,
+.stDeployButton{{display:none!important}}
+
+/* ── Sidebar ──────────────────────────────────────────────── */
 section[data-testid="stSidebar"]{{
     background:var(--bg-sidebar)!important;
     border-right:1px solid var(--border-main)!important;
     backdrop-filter:blur(20px);
 }}
+section[data-testid="stSidebar"] *{{
+    color:var(--text-primary)!important;
+}}
 
+/* ── Tab panels background ────────────────────────────────── */
+[data-testid="stTabsContent"],
+[data-baseweb="tab-panel"],
+.stTabsContent {{
+    background:transparent !important;
+}}
+
+/* ── Expanders ────────────────────────────────────────────── */
+[data-testid="stExpander"] {{
+    background:var(--expander-bg) !important;
+    border:1px solid var(--border-main) !important;
+    border-radius:10px !important;
+}}
+[data-testid="stExpander"] summary,
+[data-testid="stExpander"] summary * {{
+    color:var(--text-secondary) !important;
+}}
+[data-testid="stExpander"] [data-testid="stExpanderDetails"] {{
+    background:transparent !important;
+}}
+
+/* ── Markdown / text inside app ───────────────────────────── */
+.stMarkdown, .stMarkdown p, .stMarkdown span,
+p, span, label, div {{
+    color:var(--text-primary);
+}}
+
+/* ── Theme toggle button ──────────────────────────────────── */
 .theme-btn{{
     display:inline-flex;align-items:center;gap:7px;
     padding:7px 15px;border-radius:99px;cursor:pointer;
@@ -250,6 +297,7 @@ section[data-testid="stSidebar"]{{
     box-shadow:0 4px 24px rgba(99,102,241,0.28);
 }}
 
+/* ── Pipeline banner ──────────────────────────────────────── */
 .pipe-banner{{
     display:flex;align-items:center;justify-content:center;
     gap:0.35rem;flex-wrap:wrap;
@@ -271,6 +319,7 @@ section[data-testid="stSidebar"]{{
 .ps-nv {{background:rgba(118,169,250,0.14);border:1px solid rgba(118,169,250,0.45);color:#76a9fa}}
 .pipe-arrow{{color:var(--pipe-arrow);font-size:0.95rem;font-weight:700}}
 
+/* ── Hero ─────────────────────────────────────────────────── */
 .hero-title{{text-align:center;padding:2rem 1rem 0.5rem;animation:fadeInDown 0.7s ease-out}}
 .hero-title h1{{
     font-size:clamp(2rem,5vw,3.2rem);font-weight:900;
@@ -280,29 +329,38 @@ section[data-testid="stSidebar"]{{
 }}
 .hero-sub{{font-size:0.9rem;color:var(--hero-sub);margin-top:0.4rem}}
 
+/* ── Glass card ───────────────────────────────────────────── */
 .glass-card{{
-    background:var(--bg-card);border:1px solid var(--border-main);
-    border-radius:16px;padding:1.5rem;backdrop-filter:blur(16px);
-    box-shadow:0 4px 40px rgba(0,0,0,0.15);margin-bottom:1.1rem;
+    background:var(--bg-card);
+    border:1px solid var(--border-main);
+    border-radius:16px;padding:1.5rem;
+    backdrop-filter:blur(16px);
+    box-shadow:0 4px 40px rgba(0,0,0,0.12);
+    margin-bottom:1.1rem;
     animation:fadeInUp 0.55s ease-out;
+    color:var(--text-primary);
+    transition:border-color 0.2s;
 }}
-.gc-green {{border-color:rgba(52,211,153,0.3);box-shadow:0 0 30px rgba(52,211,153,0.07),0 4px 40px rgba(0,0,0,0.12)}}
-.gc-purple{{border-color:rgba(139,92,246,0.3);box-shadow:0 0 30px rgba(139,92,246,0.07),0 4px 40px rgba(0,0,0,0.12)}}
+.glass-card:hover{{border-color:var(--card-hover-border)}}
+.gc-green {{border-color:rgba(52,211,153,0.3);box-shadow:0 0 30px rgba(52,211,153,0.07),0 4px 40px rgba(0,0,0,0.10)}}
+.gc-purple{{border-color:rgba(139,92,246,0.3);box-shadow:0 0 30px rgba(139,92,246,0.07),0 4px 40px rgba(0,0,0,0.10)}}
 
+/* ── Stage boxes ──────────────────────────────────────────── */
 .stage-box{{border-radius:12px;padding:1rem 1.3rem;margin-top:0.65rem;position:relative;overflow:hidden}}
-.sb-groq{{background:linear-gradient(135deg,rgba(251,146,60,0.08),rgba(245,158,11,0.04));border:1px solid rgba(251,146,60,0.25)}}
-.sb-oai {{background:linear-gradient(135deg,rgba(52,211,153,0.08),rgba(34,211,238,0.04));border:1px solid rgba(52,211,153,0.25)}}
-.sb-nv  {{background:linear-gradient(135deg,rgba(118,169,250,0.10),rgba(99,102,241,0.05));border:1px solid rgba(118,169,250,0.30)}}
-.sb-err {{background:linear-gradient(135deg,rgba(239,68,68,0.08),rgba(220,38,38,0.04));border:1px solid rgba(239,68,68,0.25)}}
+.sb-groq{{background:linear-gradient(135deg,rgba(251,146,60,0.10),rgba(245,158,11,0.05));border:1px solid rgba(251,146,60,0.28)}}
+.sb-oai {{background:linear-gradient(135deg,rgba(52,211,153,0.10),rgba(34,211,238,0.05));border:1px solid rgba(52,211,153,0.28)}}
+.sb-nv  {{background:linear-gradient(135deg,rgba(118,169,250,0.12),rgba(99,102,241,0.06));border:1px solid rgba(118,169,250,0.32)}}
+.sb-err {{background:linear-gradient(135deg,rgba(239,68,68,0.10),rgba(220,38,38,0.05));border:1px solid rgba(239,68,68,0.28)}}
 .stage-label{{font-size:0.66rem;font-weight:700;letter-spacing:0.13em;text-transform:uppercase;margin-bottom:0.45rem;display:flex;align-items:center;gap:6px}}
 .sb-groq .stage-label{{color:#fb923c}}
 .sb-oai  .stage-label{{color:#34d399}}
 .sb-nv   .stage-label{{color:#76a9fa}}
 .sb-err  .stage-label{{color:#f87171}}
-.stage-content{{font-size:0.85rem;color:var(--text-secondary);line-height:1.72}}
+.stage-content{{font-size:0.85rem;color:var(--stage-text);line-height:1.72}}
 
+/* ── Roadmap ──────────────────────────────────────────────── */
 .roadmap-container{{padding:0.25rem 0}}
-.roadmap-step{{display:flex;align-items:flex-start;gap:0.85rem;padding:0.75rem 0;border-bottom:1px solid rgba(118,169,250,0.1)}}
+.roadmap-step{{display:flex;align-items:flex-start;gap:0.85rem;padding:0.75rem 0;border-bottom:1px solid rgba(118,169,250,0.12)}}
 .roadmap-step:last-child{{border-bottom:none}}
 .roadmap-icon{{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.85rem;font-weight:800;flex-shrink:0;font-family:'JetBrains Mono',monospace}}
 .rs-1{{background:rgba(99,102,241,0.2);border:1.5px solid rgba(99,102,241,0.5);color:#818cf8}}
@@ -313,34 +371,46 @@ section[data-testid="stSidebar"]{{
 .roadmap-phase{{font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:3px}}
 .roadmap-content{{font-size:0.83rem;color:var(--text-secondary);line-height:1.6}}
 
+/* ── Career card text ─────────────────────────────────────── */
 .career-name{{font-size:1.6rem;font-weight:800;color:var(--text-primary);line-height:1.2;margin-bottom:0.28rem}}
 .sec-label{{font-size:0.66rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#6366f1;margin-bottom:0.28rem}}
 .career-summary{{font-size:0.86rem;color:var(--text-muted);line-height:1.65;margin-top:0.42rem}}
 
+/* ── Risk badges ──────────────────────────────────────────── */
 .risk-badge{{display:inline-flex;align-items:center;gap:6px;border-radius:99px;padding:4px 13px;font-size:0.73rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em}}
 .risk-low   {{background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.4);color:#34d399}}
 .risk-medium{{background:rgba(251,191,36,0.12);border:1px solid rgba(251,191,36,0.4);color:#fbbf24}}
 .risk-high  {{background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.4); color:#f87171}}
 
+/* ── Score ring ───────────────────────────────────────────── */
 .score-wrapper{{display:flex;justify-content:center;padding:0.55rem 0}}
 .score-ring{{width:110px;height:110px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:900;position:relative}}
 .score-ring::before{{content:'';position:absolute;inset:5px;border-radius:50%;background:var(--bg-card-solid)}}
 .snum{{font-size:1.8rem;position:relative;z-index:1}}
 .slbl{{font-size:0.59rem;letter-spacing:0.1em;text-transform:uppercase;position:relative;z-index:1;color:var(--text-muted)}}
 
+/* ── Metric chips ─────────────────────────────────────────── */
 .metric-grid{{display:flex;flex-wrap:wrap;gap:0.48rem;margin:0.7rem 0}}
-.metric-chip{{background:var(--bg-chip);border:1px solid var(--border-chip);border-radius:10px;padding:0.48rem 0.82rem;flex:1;min-width:82px;text-align:center}}
+.metric-chip{{
+    background:var(--metric-chip-bg);
+    border:1px solid var(--border-chip);
+    border-radius:10px;padding:0.48rem 0.82rem;
+    flex:1;min-width:82px;text-align:center;
+}}
 .mc-val{{font-size:1.22rem;font-weight:800;line-height:1}}
 .mc-lbl{{font-size:0.59rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-top:3px}}
 
+/* ── Progress bars ────────────────────────────────────────── */
 .prog-wrap{{margin:0.38rem 0}}
 .prog-hdr{{display:flex;justify-content:space-between;font-size:0.73rem;margin-bottom:4px;color:var(--text-secondary)}}
 .prog-bg{{height:8px;border-radius:99px;background:var(--prog-bg);overflow:hidden}}
 .prog-fill{{height:100%;border-radius:99px}}
 
+/* ── Skill pills ──────────────────────────────────────────── */
 .skills-wrap{{display:flex;flex-wrap:wrap;gap:0.36rem;margin-top:0.55rem}}
 .skill-pill{{background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.25);border-radius:99px;padding:3px 10px;font-size:0.7rem;color:#a5b4fc;font-family:'JetBrains Mono',monospace}}
 
+/* ── Compare ──────────────────────────────────────────────── */
 .cmp-row{{display:grid;grid-template-columns:1fr 2fr 2fr;gap:0.42rem;align-items:center;padding:0.48rem 0;border-bottom:1px solid var(--cmp-border)}}
 .cmp-mname{{font-size:0.71rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em}}
 .cmp-bwrap{{display:flex;align-items:center;gap:7px;font-size:0.77rem}}
@@ -348,28 +418,90 @@ section[data-testid="stSidebar"]{{
 .winner-badge{{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(251,191,36,0.2),rgba(245,158,11,0.1));border:1px solid rgba(251,191,36,0.5);border-radius:99px;padding:6px 18px;color:#fbbf24;font-weight:700;font-size:0.82rem;animation:glow 2s ease-in-out infinite alternate}}
 @keyframes glow{{0%{{box-shadow:0 0 8px rgba(251,191,36,0.3)}}100%{{box-shadow:0 0 20px rgba(251,191,36,0.5)}}}}
 
+/* ── Trend items ──────────────────────────────────────────── */
 .trend-item{{background:var(--trend-bg);border:1px solid var(--trend-border);border-radius:10px;padding:0.52rem 0.78rem;margin-bottom:0.4rem;display:flex;justify-content:space-between;align-items:center}}
 .trend-name{{font-size:0.78rem;color:var(--text-primary);font-weight:600}}
 .trend-badge{{border-radius:99px;padding:2px 9px;font-size:0.67rem;font-weight:700}}
 
-.stTextInput>div>div>input,.stTextArea>div>div>textarea{{
+/* ── Inputs ───────────────────────────────────────────────── */
+.stTextInput>div>div>input,
+.stTextArea>div>div>textarea{{
     background:var(--bg-input)!important;
     border:1.5px solid var(--border-input)!important;
     border-radius:10px!important;
     color:var(--text-primary)!important;
-    font-family:'Inter',sans-serif!important;font-size:0.91rem!important
+    font-family:'Inter',sans-serif!important;font-size:0.91rem!important;
 }}
-.stTextInput>div>div>input:focus{{border-color:rgba(99,102,241,0.7)!important;box-shadow:0 0 0 3px rgba(99,102,241,0.1)!important}}
-.stSelectbox>div>div{{background:var(--bg-input)!important;border:1.5px solid var(--border-input)!important;border-radius:10px!important}}
-.stButton>button{{background:linear-gradient(135deg,#6366f1,#4f46e5)!important;color:white!important;border:none!important;border-radius:10px!important;padding:0.56rem 1.6rem!important;font-weight:700!important;font-size:0.86rem!important;width:100%!important;box-shadow:0 4px 20px rgba(99,102,241,0.35)!important;transition:all 0.2s!important}}
-.stButton>button:hover{{transform:translateY(-2px)!important;box-shadow:0 8px 30px rgba(99,102,241,0.5)!important}}
+.stTextInput>div>div>input::placeholder,
+.stTextArea>div>div>textarea::placeholder{{
+    color:var(--text-muted)!important;
+}}
+.stTextInput>div>div>input:focus{{
+    border-color:rgba(99,102,241,0.7)!important;
+    box-shadow:0 0 0 3px rgba(99,102,241,0.1)!important;
+}}
 
-.stTabs [data-baseweb="tab-list"]{{background:var(--tab-list)!important;border-radius:12px!important;padding:4px!important;gap:4px!important;border:1px solid var(--border-main)!important}}
-.stTabs [data-baseweb="tab"]{{background:transparent!important;color:var(--tab-text)!important;border-radius:8px!important;font-weight:600!important;font-size:0.82rem!important;padding:0.44rem 1rem!important}}
-.stTabs [aria-selected="true"]{{background:var(--tab-sel)!important;color:var(--tab-sel-text)!important}}
-.stTabs [data-baseweb="tab-panel"]{{padding-top:1rem!important}}
+/* ── Selectboxes ──────────────────────────────────────────── */
+.stSelectbox>div>div{{
+    background:var(--bg-input)!important;
+    border:1.5px solid var(--border-input)!important;
+    border-radius:10px!important;
+    color:var(--text-primary)!important;
+}}
+.stSelectbox [data-baseweb="select"] *{{color:var(--text-primary)!important}}
 
+/* ── Sliders ──────────────────────────────────────────────── */
+.stSlider [data-baseweb="slider"] {{background:var(--bg-input)!important}}
+
+/* ── Buttons ──────────────────────────────────────────────── */
+.stButton>button{{
+    background:linear-gradient(135deg,#6366f1,#4f46e5)!important;
+    color:white!important;border:none!important;border-radius:10px!important;
+    padding:0.56rem 1.6rem!important;font-weight:700!important;font-size:0.86rem!important;
+    width:100%!important;
+    box-shadow:0 4px 20px rgba(99,102,241,0.35)!important;
+    transition:all 0.2s!important;
+}}
+.stButton>button:hover{{
+    transform:translateY(-2px)!important;
+    box-shadow:0 8px 30px rgba(99,102,241,0.5)!important;
+}}
+
+/* ── Tabs ─────────────────────────────────────────────────── */
+.stTabs [data-baseweb="tab-list"]{{
+    background:var(--tab-list)!important;
+    border-radius:12px!important;padding:4px!important;
+    gap:4px!important;border:1px solid var(--border-main)!important;
+}}
+.stTabs [data-baseweb="tab"]{{
+    background:transparent!important;
+    color:var(--tab-text)!important;
+    border-radius:8px!important;font-weight:600!important;
+    font-size:0.82rem!important;padding:0.44rem 1rem!important;
+}}
+.stTabs [aria-selected="true"]{{
+    background:var(--tab-sel)!important;
+    color:var(--tab-sel-text)!important;
+}}
+.stTabs [data-baseweb="tab-panel"]{{
+    padding-top:1rem!important;
+    background:transparent!important;
+}}
+
+/* ── Spinner / status ─────────────────────────────────────── */
+[data-testid="stStatusWidget"] {{background:var(--bg-card)!important}}
+
+/* ── Warnings / info boxes ────────────────────────────────── */
+[data-testid="stAlert"] {{
+    background:var(--bg-card)!important;
+    border-color:var(--border-main)!important;
+    color:var(--text-primary)!important;
+}}
+
+/* ── Hr divider ───────────────────────────────────────────── */
 hr{{border-color:var(--divider)!important}}
+
+/* ── Animations ───────────────────────────────────────────── */
 @keyframes fadeInDown{{from{{opacity:0;transform:translateY(-18px)}}to{{opacity:1;transform:translateY(0)}}}}
 @keyframes fadeInUp  {{from{{opacity:0;transform:translateY(18px)}} to{{opacity:1;transform:translateY(0)}}}}
 </style>
@@ -787,7 +919,7 @@ def score_ring_html(score):
     deg = int(score * 3.6)
     return (f'<div class="score-wrapper">'
             f'<div class="score-ring" style="background:conic-gradient({c} 0deg {deg}deg,'
-            f'rgba(30,41,59,0.6) {deg}deg 360deg)">'
+            f'var(--prog-bg) {deg}deg 360deg)">'
             f'<span class="snum" style="color:{c}">{score}</span>'
             f'<span class="slbl">/ 100</span></div></div>')
 
@@ -882,7 +1014,7 @@ def render_career_card(row: dict, groq_out: str, openai_out: str,
           <span>💼 Openings: <b style="color:#a5b4fc">{jobs}K+</b></span>
         </div></div>""", unsafe_allow_html=True)
 
-    st.markdown("**🛠 Required Skills**")
+    st.markdown(f'<p style="color:var(--text-secondary);font-weight:700;font-size:0.85rem;margin:0.6rem 0 0">🛠 Required Skills</p>', unsafe_allow_html=True)
     st.markdown(skills_html(row.get("required_skills","")), unsafe_allow_html=True)
     st.markdown("<br>", unsafe_allow_html=True)
 
@@ -944,11 +1076,13 @@ def render_compare(row_a: dict, row_b: dict):
     <div class="glass-card gc-purple">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.85rem;margin-bottom:0.85rem">
         <div style="text-align:center;padding:0.62rem;border-radius:10px;
-                    background:rgba(99,102,241,0.14);border:1px solid rgba(99,102,241,0.35);
-                    color:
+                    background:rgba(99,102,241,0.14);border:1px solid rgba(99,102,241,0.35);">
+          <span style="color:#818cf8;font-weight:700;font-size:0.9rem">{row_a['career_domain']}</span>
+        </div>
         <div style="text-align:center;padding:0.62rem;border-radius:10px;
-                    background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.3);
-                    color:
+                    background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.3);">
+          <span style="color:#34d399;font-weight:700;font-size:0.9rem">{row_b['career_domain']}</span>
+        </div>
       </div>""", unsafe_allow_html=True)
 
     for lbl, key, mx, sfx in metrics:
@@ -994,6 +1128,7 @@ def render_compare(row_a: dict, row_b: dict):
     </div></div>""", unsafe_allow_html=True)
 
 
+# ── Sidebar ────────────────────────────────────────────────────────────────────
 groq_ok   = bool(os.getenv("GROQ_API_KEY",     ""))
 openai_ok = bool(os.getenv("OPENAI_API_KEY",   ""))
 ls_ok     = bool(os.getenv("LANGSMITH_API_KEY",""))
@@ -1021,7 +1156,8 @@ with st.sidebar:
         return (f'<div style="display:flex;justify-content:space-between;align-items:center;'
                 f'padding:5px 8px;border-radius:8px;margin-bottom:3px;'
                 f'background:var(--trend-bg);border:1px solid var(--trend-border)">'
-                f'<span style="font-size:0.74rem">{icon} <span style="color:var(--text-faint);font-size:0.62rem">{stage}</span> '
+                f'<span style="font-size:0.74rem;color:var(--text-primary)">{icon} '
+                f'<span style="color:var(--text-faint);font-size:0.62rem">{stage}</span> '
                 f'<b style="color:var(--text-secondary)">{label}</b></span>'
                 f'<span style="font-size:0.68rem;color:{c}">{dot} {txt}</span></div>')
 
@@ -1050,6 +1186,7 @@ with st.sidebar:
     </div>""", unsafe_allow_html=True)
 
 
+# ── Main content ───────────────────────────────────────────────────────────────
 st.markdown("""
 <div class="hero-title">
   <h1>🔮 CareerAI</h1>
